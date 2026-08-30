@@ -32,7 +32,7 @@ GIFs are uploaded from a smartphone over Wi-Fi, processed directly in the browse
 * 📦 Maximum 30 output frames per GIF
 
 ---
-
+![ESP32 GIF Player](images/1.jpeg)
 # Hardware
 
 ## Required Hardware
