@@ -33,6 +33,7 @@ GIFs are uploaded from a smartphone over Wi-Fi, processed directly in the browse
 
 ---
 ![ESP32 GIF Player](images/1.jpeg)
+[![ESP32 GIF Player Demo](images/2.mp4)
 # Hardware
 
 ## Required Hardware
