@@ -1,2 +1,4 @@
 # Esp32Gifplayer-on-1.8-inch-display
-A high-speed GIF player for ESP32 with a 1.8-inch SPI TFT display. GIF files can be uploaded over Wi-Fi and stored in LittleFS for fast and smooth playback directly from the ESP32.
+⚠️ Please read the README before using this project.
+
+A high-speed ESP32 GIF player with Wi-Fi upload, optimized playback, 1.8" ST7735 TFT support, and LittleFS storage.
