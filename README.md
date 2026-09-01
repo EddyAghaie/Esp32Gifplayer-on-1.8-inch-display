@@ -42,9 +42,8 @@ The hardware is designed around a **Wemos D1 Mini ESP32**, a **1.8-inch ST7735 T
 
 ![ESP32 GIF Player](images/1.jpeg)
 
-### GIF Player Demo
 
-[![ESP32 GIF Player Demo](images/2.jpg)](images/2.mp4)
+
 
 ---
 
@@ -183,7 +182,7 @@ The following pin configuration is used by the firmware:
 | LED / BL   |     GPIO 4 | Backlight      |
 
 ### Wiring
-
+![ESP32 GIF Player](images/schema.PNG)
 ```text
 Wemos D1 Mini ESP32        ST7735 1.8"
 ---------------------------------------
