@@ -1,8 +1,12 @@
 # PCB Design
-ESP BOM.BMP
-""
+
+---
+
+
 ![ESP32 GIF Player](PCB/ESP BOM.BMP)
-""
+
+
+---
 
 The PCB design for this project is provided in the `PCB` directory.
 
