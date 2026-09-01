@@ -1,13 +1,16 @@
 # Esp32Gifplayer-on-1.8-inch-display
-⚠️ Please read the README before using this project.
+
+⚠️ **Please read the README before using this project.**
 
 A high-speed ESP32 GIF player with Wi-Fi upload, optimized playback, 1.8" ST7735 TFT support, and LittleFS storage.
-# ESP32 High-Speed GIF Player
 
+# ESP32 High-Speed GIF Player
 
 This project is designed as one of the **fastest and simplest ways to play GIF animations on a standard ESP32 over Wi-Fi**, without requiring an SD card or an internet connection.
 
 GIFs are uploaded from a smartphone over Wi-Fi, processed directly in the browser, converted into an optimized custom binary format, and stored in **LittleFS**. The ESP32 then reads the optimized frames directly from flash memory and plays them continuously on the TFT display.
+
+The hardware is designed around a **Wemos D1 Mini ESP32**, a **1.8-inch ST7735 TFT display**, and a compact **650mAh 3.7V Li-ion battery** with a **TP4056 charging module**.
 
 ---
 
@@ -30,20 +33,137 @@ GIFs are uploaded from a smartphone over Wi-Fi, processed directly in the browse
 * 🔄 Factory reset using 5 power cycles
 * 💻 GIF decoding is performed in the browser using pure JavaScript
 * 📦 Maximum 30 output frames per GIF
+* 🔋 650mAh 3.7V Li-ion battery
+* 🔌 TP4056 Li-ion battery charging
+* ⏻ ON/OFF power switch
+* 🧳 Portable battery-powered design
 
 ---
+
 ![ESP32 GIF Player](images/1.jpeg)
-[![ESP32 GIF Player Demo](images/2.mp4)
+
+### GIF Player Demo
+
+[![ESP32 GIF Player Demo](images/2.jpg)](images/2.mp4)
+
+---
+
 # Hardware
 
 ## Required Hardware
 
-* Standard ESP32 development board
-* 1.8-inch ST7735 SPI TFT display
-* USB cable / suitable power supply
+* **Wemos D1 Mini ESP32**
+* 1.8-inch ST7735 SPI TFT display, 160×128
+* **650mAh 3.7V Li-ion battery**
+* **TP4056 Li-ion charging module with USB input**
+* ON/OFF slide switch
+* 5V USB power source for charging
 * Jumper wires
+* Appropriate regulated power circuit for the ESP32
 
-The project is designed around a standard ESP32 and does not require an ESP32-S3, ESP32-C3, or other specialized variant.
+The project uses a **Wemos D1 Mini ESP32** as the main controller.
+
+The device does not require:
+
+* ESP32-S3
+* ESP32-C3
+* SD card
+* Internet connection
+* Cloud service
+
+---
+
+# Power & Charging
+
+The project uses a **650mAh 3.7V Li-ion battery** as the portable power source.
+
+The TP4056 module is used for **charging the Li-ion battery**.
+
+## Battery Connection
+
+Connect the battery to the battery terminals of the TP4056:
+
+```text
+650mAh Li-ion Battery
+       │
+       ├── Battery + ───────> TP4056 BAT+
+       │
+       └── Battery − ───────> TP4056 BAT−
+```
+
+## USB Charging
+
+The TP4056 module is charged through its **USB input**.
+
+Simply connect a standard **5V USB power source** to the USB port on the TP4056:
+
+```text
+5V USB Charger
+      │
+      ▼
+TP4056 USB Port
+      │
+      ▼
+650mAh Li-ion Battery
+```
+
+No separate wiring to `IN+` or `IN−` is required when using the USB connector on the TP4056 module.
+
+> **Important:** Use a suitable 5V USB power source for charging. Do not connect the battery to the USB input.
+
+---
+
+# Power Switch
+
+The ON/OFF switch is placed in the positive power path between the battery power output and the ESP32 power circuit.
+
+Recommended power flow:
+
+```text
+650mAh 3.7V Li-ion Battery
+          │
+          ▼
+     ON/OFF Switch
+          │
+          ▼
+ Proper Voltage Regulation
+          │
+          ▼
+ Wemos D1 Mini ESP32
+```
+
+The TP4056 remains responsible for charging the battery through its USB connector.
+
+> **Important:** The TP4056 is a battery charger, not a 3.3V regulator. Do not connect a raw 3.7–4.2V Li-ion battery directly to the ESP32 `3V3` pin. Use the appropriate regulated power circuit for the Wemos D1 Mini ESP32.
+
+---
+
+# Complete Power Flow
+
+```text
+                USB 5V
+                  │
+                  ▼
+           ┌─────────────┐
+           │   TP4056    │
+           │ USB Charger │
+           └──────┬──────┘
+                  │
+                  ▼
+        650mAh 3.7V Li-ion
+                  │
+                  ▼
+            ON/OFF Switch
+                  │
+                  ▼
+        Proper Voltage Regulator
+                  │
+                  ▼
+        Wemos D1 Mini ESP32
+                  │
+                  ▼
+             ST7735 TFT
+```
 
 ---
 
@@ -65,19 +185,32 @@ The following pin configuration is used by the firmware:
 ### Wiring
 
 ```text
-ESP32                  ST7735 1.8"
-----------------------------------
-3.3V       ----------> VCC
-GND        ----------> GND
-GPIO18     ----------> SCK / SCL
-GPIO23     ----------> SDA / MOSI
-GPIO5      ----------> CS
-GPIO21     ----------> DC / A0
-GPIO2      ----------> RST / RES
-GPIO4      ----------> LED / BL
+Wemos D1 Mini ESP32        ST7735 1.8"
+---------------------------------------
+3.3V          -----------> VCC
+GND           -----------> GND
+GPIO18        -----------> SCK / SCL
+GPIO23        -----------> SDA / MOSI
+GPIO5         -----------> CS
+GPIO21        -----------> DC / A0
+GPIO2         -----------> RST / RES
+GPIO4         -----------> LED / BL
 ```
 
 > **Important:** The display logic is configured for 3.3V. Do not apply 5V directly to 3.3V-only display pins.
+
+---
+
+# ESP32 GPIO Summary
+
+```text
+ST7735 SCK  → GPIO18
+ST7735 MOSI → GPIO23
+ST7735 CS   → GPIO5
+ST7735 DC   → GPIO21
+ST7735 RST  → GPIO2
+ST7735 LED  → GPIO4
+```
 
 ---
 
@@ -86,8 +219,8 @@ GPIO4      ----------> LED / BL
 The firmware is configured for:
 
 ```text
-Display:    ST7735
-Resolution: 160 × 128
+Display:     ST7735
+Resolution:  160 × 128
 Orientation: Landscape
 ```
 
@@ -139,6 +272,8 @@ Tools
 → ESP32 Arduino
 → ESP32 Dev Module
 ```
+
+The firmware uses the standard ESP32 Arduino configuration and is designed to run on the **Wemos D1 Mini ESP32**.
 
 ## Recommended Settings
 
@@ -259,11 +394,19 @@ The QR implementation is based on the `ricmoo/QRCode` project with modifications
 Your project folder should look like:
 
 ```text
-GifFrame/
+Esp32Gifplayer-on-1.8-inch-display/
 │
-├── GifFrame.ino
-├── QRCodeGen.h
-└── QRCodeGen.c
+├── GifFrame/
+│   ├── GifFrame.ino
+│   ├── QRCodeGen.h
+│   └── QRCodeGen.c
+│
+├── images/
+│   ├── 1.jpeg
+│   ├── 2.jpg
+│   └── ...
+│
+└── README.md
 ```
 
 ---
@@ -727,17 +870,54 @@ Recommended:
 
 The project is designed around a 3.3V ESP32 and 3.3V display logic.
 
-### 4. GIF size matters
+### 4. Battery charging
+
+The **650mAh 3.7V Li-ion battery** connects to:
+
+```text
+TP4056 BAT+ → Battery +
+TP4056 BAT− → Battery −
+```
+
+Charging is performed through the TP4056's **USB connector** using a suitable 5V USB power source.
+
+### 5. TP4056 is not a voltage regulator
+
+The TP4056 is responsible for charging the Li-ion battery.
+
+It does **not** regulate the battery voltage to 3.3V.
+
+Use the appropriate regulated power circuit for the Wemos D1 Mini ESP32.
+
+### 6. Do not connect the raw battery to 3V3
+
+The Li-ion battery voltage varies approximately between:
+
+```text
+4.2V → fully charged
+3.7V → nominal
+lower voltage → discharged
+```
+
+Therefore, do not connect the battery directly to the ESP32 `3V3` pin.
+
+### 7. GIF size matters
 
 Large GIFs can produce large `GFA1` files.
 
 If the filesystem becomes full, upload a smaller GIF or one with fewer frames.
 
-### 5. Wi-Fi is open
+### 8. Wi-Fi is open
 
 The ESP32 Access Point intentionally uses no password.
 
 Do not use this configuration for sensitive networks.
+
+### 9. Keep SPI wires short
+
+For reliable high-speed SPI communication, keep the TFT wires as short as practical.
+
+Long wires can introduce signal integrity problems, especially at higher SPI clock speeds.
 
 ---
 
@@ -749,8 +929,10 @@ Maximum output frames:  30
 Storage:                LittleFS
 Display interface:      SPI
 Wi-Fi:                  ESP32 Access Point
+Battery:                650mAh 3.7V Li-ion
+Charging:               TP4056 USB
 External SD card:       Not required
-Internet:                Not required
+Internet:               Not required
 ```
 
 The actual maximum animation size depends on the filesystem partition and available LittleFS space.
@@ -761,7 +943,7 @@ The actual maximum animation size depends on the filesystem partition and availa
 
 This project uses:
 
-* ESP32
+* Wemos D1 Mini ESP32
 * Arduino Framework
 * C++
 * SPI
@@ -778,6 +960,8 @@ This project uses:
 * QR Code generation
 * Custom GFA1 binary format
 * RGB565
+* TP4056 Li-ion charging
+* 650mAh Li-ion battery
 
 ---
 
@@ -846,23 +1030,31 @@ This approach is specifically designed to achieve very fast and lightweight GIF 
           ↓
 8. Connect the ST7735 using the pinout above
           ↓
-9. Upload the firmware
+9. Connect the 650mAh Li-ion battery to TP4056 BAT+ / BAT−
           ↓
-10. Open Serial Monitor at 115200
+10. Connect a 5V USB charger to the TP4056 USB port
           ↓
-11. Connect your phone to the TABLOXXXX Wi-Fi
+11. Connect the ON/OFF switch to the power path
           ↓
-12. Scan the second QR code
+12. Connect the regulated power output to the Wemos D1 Mini
           ↓
-13. Select an image or GIF
+13. Upload the firmware
           ↓
-14. Wait for browser processing
+14. Open Serial Monitor at 115200
           ↓
-15. Upload the generated GFA1 file
+15. Connect your phone to the TABLOXXXX Wi-Fi
           ↓
-16. ESP32 stores it in LittleFS
+16. Scan the second QR code
           ↓
-17. GIF starts playing automatically
+17. Select an image or GIF
+          ↓
+18. Wait for browser processing
+          ↓
+19. Upload the generated GFA1 file
+          ↓
+20. ESP32 stores it in LittleFS
+          ↓
+21. GIF starts playing automatically
 ```
 
 ---
@@ -873,4 +1065,20 @@ The goal of **GifFrame** is to provide a fast, simple and standalone way to turn
 
 The project moves GIF processing to the smartphone and keeps the ESP32 playback system lightweight and optimized for speed.
 
-**ESP32 + ST7735 + Wi-Fi + LittleFS = Fast standalone GIF Frame**
+With the compact battery-powered hardware, the device can operate as a **portable standalone GIF display** without requiring an SD card, internet connection, or external server.
+
+```text
+Wemos D1 Mini ESP32
+        +
+    ST7735 TFT
+        +
+   Wi-Fi Upload
+        +
+    LittleFS
+        +
+650mAh Li-ion Battery
+        +
+      TP4056
+        =
+Portable High-Speed GIF Frame
+```
